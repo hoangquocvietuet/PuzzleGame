@@ -5,6 +5,7 @@ LTexture::LTexture()
 	mTexture = NULL;
 	mWidth = 0;
 	mHeight = 0;
+	setBlendMode(SDL_BLENDMODE_BLEND);
 }
 
 LTexture::~LTexture()
