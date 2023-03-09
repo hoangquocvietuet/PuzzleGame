@@ -1,5 +1,5 @@
 # PuzzleGame
-my Advanced Programming project - a Puzzle Game built by SDL
+my Advanced Programming project - a Puzzle Game built with SDL and C++.
 
 ## Window Install
 
