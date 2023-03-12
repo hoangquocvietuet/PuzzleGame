@@ -52,6 +52,14 @@ bool LGame::loadGameMedia() {
     if (!initPieceFromFile("../assets/pieces.txt")) {
         success = false;
     }
+    startGameMusic = Mix_LoadMUS("../assets/startgame-music.mp3");
+    if (startGameMusic == NULL) {
+        success = false;
+    }
+    playGameMusic = Mix_LoadMUS("../assets/playgame-music.mp3");
+    if (playGameMusic == NULL) {
+        success = false;
+    }
     return success;
 }
 
@@ -220,6 +228,7 @@ void LGame::resetGame() {
 }
 
 void LGame::gameLoop() {
+    Mix_PlayMusic(playGameMusic, -1);
     resetGame();
     while (true) {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
@@ -244,9 +253,7 @@ void LGame::gameLoop() {
         exitGameButton.render(mRenderer);
         SDL_RenderPresent(mRenderer);
         if (checkLosingGame()) {
-            SDL_Delay(500);
             sc.saveScore("../assets/bestScore.txt");
-            endPage();
             break;
         }
         while (SDL_PollEvent(&mEvent)) {
@@ -255,15 +262,17 @@ void LGame::gameLoop() {
             }
         }
     }   
+    SDL_Delay(600);
+    Mix_HaltMusic();
+    endPage();
 }
 
-bool LGame::handleStartPageEvent() {
+int LGame::handleStartPageEvent() {
     int tmpx, tmpy;
     SDL_GetMouseState(&tmpx, &tmpy);
     if (startGameButton.mouseFocusOn(tmpx, tmpy)) {
         if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
-            gameLoop();
-            return true;
+            return 1;
         }
         startGameButton.setFocus(true);
     } else {
@@ -271,17 +280,19 @@ bool LGame::handleStartPageEvent() {
     }
     if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
         if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
-            return true;
+            return 2;
         }
         exitGameButton.setFocus(true);
     } else {
         exitGameButton.setFocus(false);
     }
-    return false;
+    return 0;
 }
 
 void LGame::startPage() {
-    bool stop = false;
+    int stop = 0;
+    Mix_PlayMusic(startGameMusic, -1);
+    Mix_VolumeMusic(10);
     while (!stop) {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
         SDL_RenderClear(mRenderer);
@@ -293,6 +304,9 @@ void LGame::startPage() {
             stop = handleStartPageEvent();
         }
     }
+    Mix_HaltMusic();
+    SDL_Delay(400);
+    if (stop == 1) gameLoop();
 }
 
 int LGame::handleEndPageEvent() {
@@ -300,7 +314,6 @@ int LGame::handleEndPageEvent() {
     SDL_GetMouseState(&tmpx, &tmpy);
     if (restartGameButton.mouseFocusOn(tmpx, tmpy)) {
         if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
-            gameLoop();
             return 1;
         }
         restartGameButton.setFocus(true);

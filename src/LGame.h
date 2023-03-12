@@ -6,6 +6,7 @@
 #include "ALLConst.h"
 #include "LButton.h"
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <vector>
 #include <fstream>
 #include <string>
@@ -102,6 +103,12 @@ class LGame {
         */
         Candidate candidatePiece[NUM_CANDIDATE];
 
+        /*
+            music !!
+        */
+        Mix_Music* startGameMusic = NULL;
+        Mix_Music* playGameMusic = NULL;
+
     public:
         /*
             * constructor
@@ -173,7 +180,7 @@ class LGame {
         /*
             if you clicked on start game, its running into gameloop
         */
-        bool handleStartPageEvent();
+        int handleStartPageEvent();
 
         /*
             @return 1 if you clicked on restart, or 2 if exit

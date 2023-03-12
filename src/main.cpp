@@ -57,6 +57,10 @@ bool init() {
                     printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
+                if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048)) {
+                    printf("failed to initialize music mixer! Error: %s\n", Mix_GetError());
+                    success = false;    
+                }
             }
         }
     }
