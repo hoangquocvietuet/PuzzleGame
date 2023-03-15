@@ -4,6 +4,9 @@ LGame::LGame(SDL_Renderer* gRenderer, SDL_Window* gWindow, TTF_Font* gFont) {
     mRenderer = gRenderer;
     mWindow = gWindow;
     mFont = gFont;
+    playVideoWindow = SDL_CreateWindow("who asked", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 360, SDL_WINDOW_BORDERLESS);
+    playVideoRenderer = SDL_CreateRenderer(playVideoWindow, -1, SDL_RENDERER_ACCELERATED);
+    SDL_HideWindow(playVideoWindow);
     if (!loadGameMedia()) {
         printf("fail to load game media\n");
     }
@@ -24,6 +27,10 @@ LGame::~LGame() {
     mRenderer = NULL;
     mFont = NULL;
     mWindow = NULL;
+    SDL_DestroyWindow(playVideoWindow);
+    SDL_DestroyRenderer(playVideoRenderer);
+    playVideoWindow = NULL;
+    playVideoRenderer = NULL;
 }
  
 bool LGame::loadGameMedia() {
@@ -49,7 +56,22 @@ bool LGame::loadGameMedia() {
     if (!exitGameButton.init(mRenderer, "../assets/exit.png", 470, 0)) {
         success = false;
     }
+    if (!doubleScoreButton.init(mRenderer, "../assets/doubleScore-button.png", 130, 500)) {
+        success = false;
+    }
     if (!initPieceFromFile("../assets/pieces.txt")) {
+        success = false;
+    }
+    for (int i = 0; i < 190; ++ i) {
+        std::stringstream ss; ss << (i + 1);
+        std::string path; ss >> path;
+        path = "../assets/rickroll/out" + path + ".png";
+        if (!rickRoll[i].loadFromFile(playVideoRenderer, path)) {
+            success = false;
+        }
+    }
+    rickRollMusic = Mix_LoadMUS("../assets/rickroll/audio.mp3");
+    if (rickRollMusic == NULL) {
         success = false;
     }
     startGameMusic = Mix_LoadMUS("../assets/startgame-music.mp3");
@@ -103,55 +125,52 @@ bool LGame::checkCurrentPieceInside(int u, int v, LPiece piece) {
     * step 3: enjoy the game!
 */
 bool LGame::handleGameEvent() {
-    int tmpx, tmpy;
-    SDL_GetMouseState(&tmpx, &tmpy);
-    if (IdxCandidatePiece == -1 && mEvent.type == SDL_MOUSEBUTTONDOWN) {
-        for (int i = 0; i < NUM_CANDIDATE; ++ i) {
-            if (candidatePiece[i].piece.mouseFocusOn(tmpx, tmpy)) {
-                IdxCandidatePiece = i;
-                SDL_WarpMouseInWindow(mWindow, candidatePiece[IdxCandidatePiece].piece.getX(), candidatePiece[IdxCandidatePiece].piece.getY());
-                break;
-            }
-        }
-    }
-    if (IdxCandidatePiece != -1 && mEvent.type == SDL_MOUSEBUTTONUP) {
-        if (row != -1) {
-            for (int i = 0; i < candidatePiece[IdxCandidatePiece].piece.getNumRowPattern(); ++ i) {
-                for (int j = 0; j < candidatePiece[IdxCandidatePiece].piece.getLengthRowPattern(i); ++ j) {
-                    if (candidatePiece[IdxCandidatePiece].piece.getCharacterPattern(i, j) == blockWood) {
-                        currentBlock[i + row][j + col].type = blockWood;
-                    }
+    while (SDL_PollEvent(&mEvent)) {
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
+        if (IdxCandidatePiece == -1 && mEvent.type == SDL_MOUSEBUTTONDOWN) {
+            for (int i = 0; i < NUM_CANDIDATE; ++ i) {
+                if (candidatePiece[i].piece.mouseFocusOn(tmpx, tmpy)) {
+                    IdxCandidatePiece = i;
+                    SDL_WarpMouseInWindow(mWindow, candidatePiece[IdxCandidatePiece].piece.getX(), candidatePiece[IdxCandidatePiece].piece.getY());
+                    break;
                 }
             }
-            candidatePiece[IdxCandidatePiece].piece = rnd.getOneRandom(vectorPiece);
         }
-        candidatePiece[IdxCandidatePiece].piece.setPosition(candidatePiece[IdxCandidatePiece].x, candidatePiece[IdxCandidatePiece].y);
-        row = col = -1;
-        IdxCandidatePiece = -1;
-    }
-    if (IdxCandidatePiece != -1 && mEvent.type == SDL_MOUSEMOTION) {
-        candidatePiece[IdxCandidatePiece].piece.setPosition(tmpx, tmpy);
+        if (IdxCandidatePiece != -1 && mEvent.type == SDL_MOUSEBUTTONUP) {
+            if (row != -1) {
+                for (int i = 0; i < candidatePiece[IdxCandidatePiece].piece.getNumRowPattern(); ++ i) {
+                    for (int j = 0; j < candidatePiece[IdxCandidatePiece].piece.getLengthRowPattern(i); ++ j) {
+                        if (candidatePiece[IdxCandidatePiece].piece.getCharacterPattern(i, j) == blockWood) {
+                            currentBlock[i + row][j + col].type = blockWood;
+                        }
+                    }
+                }
+                candidatePiece[IdxCandidatePiece].piece = rnd.getOneRandom(vectorPiece);
+            }
+            candidatePiece[IdxCandidatePiece].piece.setPosition(candidatePiece[IdxCandidatePiece].x, candidatePiece[IdxCandidatePiece].y);
+            row = col = -1;
+            IdxCandidatePiece = -1;
+        }
+        if (IdxCandidatePiece != -1 && mEvent.type == SDL_MOUSEMOTION) {
+            candidatePiece[IdxCandidatePiece].piece.setPosition(tmpx, tmpy);
 
-        row = col = -1;
-        for (int i = 0; i < SIZE; ++ i) {
-            for (int j = 0; j < SIZE; ++ j) {
-                if (inside(currentBlock[i][j].x, currentBlock[i][j].y,
-                SQUARE_LENGTH, SQUARE_DISTANCE, tmpx, tmpy)) {
-                    if (checkCurrentPieceInside(i, j, candidatePiece[IdxCandidatePiece].piece)) {
-                        row = i;
-                        col = j;
+            row = col = -1;
+            for (int i = 0; i < SIZE; ++ i) {
+                for (int j = 0; j < SIZE; ++ j) {
+                    if (inside(currentBlock[i][j].x, currentBlock[i][j].y,
+                    SQUARE_LENGTH, SQUARE_DISTANCE, tmpx, tmpy)) {
+                        if (checkCurrentPieceInside(i, j, candidatePiece[IdxCandidatePiece].piece)) {
+                            row = i;
+                            col = j;
+                        }
                     }
                 }
             }
         }
-    }
-    if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
-        if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
+        if (mEvent.type == SDL_MOUSEBUTTONDOWN && exitGameButton.mouseFocusOn(tmpx, tmpy)) {
             return true;
         }
-        exitGameButton.setFocus(true);
-    } else {
-        exitGameButton.setFocus(false);
     }
     return false;
 }
@@ -233,58 +252,55 @@ void LGame::gameLoop() {
     while (true) {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
         SDL_RenderClear(mRenderer);
-        backGround.render(mRenderer, 0, 0);
-        for (int i = 0; i < SIZE; ++ i) {
-            for (int j = 0; j < SIZE; ++ j) {
-                loadedBlock[currentBlock[i][j].type].render(mRenderer, currentBlock[i][j].x, currentBlock[i][j].y);
+        {
+            backGround.render(mRenderer, 0, 0);
+            for (int i = 0; i < SIZE; ++ i) {
+                for (int j = 0; j < SIZE; ++ j) {
+                    loadedBlock[currentBlock[i][j].type].render(mRenderer, currentBlock[i][j].x, currentBlock[i][j].y);
+                }
             }
-        }
-        for (int i = 0; i < NUM_CANDIDATE; ++ i) {
-            if (i != IdxCandidatePiece) {
-                candidatePiece[i].piece.draw(mRenderer, 0, 1, candidatePiece[i].x, candidatePiece[i].y);
+            for (int i = 0; i < NUM_CANDIDATE; ++ i) {
+                if (i != IdxCandidatePiece) {
+                    candidatePiece[i].piece.draw(mRenderer, 0, 1, candidatePiece[i].x, candidatePiece[i].y);
+                }
             }
+            loadPreview();
+            if (IdxCandidatePiece != -1) {
+                candidatePiece[IdxCandidatePiece].piece.draw(mRenderer, 0);
+            }
+            updateScoreAndGameState();
+            sc.printScore(mRenderer, mFont, 178, 143, 162, 73);
+
+            int tmpx, tmpy;
+            SDL_GetMouseState(&tmpx, &tmpy);
+            exitGameButton.render(mRenderer, tmpx, tmpy);
         }
-        loadPreview();
-        if (IdxCandidatePiece != -1) {
-            candidatePiece[IdxCandidatePiece].piece.draw(mRenderer, 0);
-        }
-        updateScoreAndGameState();
-        sc.printScore(mRenderer, mFont, 178, 143, 162, 73);
-        exitGameButton.render(mRenderer);
         SDL_RenderPresent(mRenderer);
         if (checkLosingGame()) {
             sc.saveScore("../assets/bestScore.txt");
             break;
         }
-        while (SDL_PollEvent(&mEvent)) {
-            if (handleGameEvent()) {
-                return;
-            }
+        // exit game
+        if (handleGameEvent()) {
+            return;
         }
     }   
     SDL_Delay(600);
     Mix_HaltMusic();
-    endPage();
+    endPage(0);
 }
 
 int LGame::handleStartPageEvent() {
-    int tmpx, tmpy;
-    SDL_GetMouseState(&tmpx, &tmpy);
-    if (startGameButton.mouseFocusOn(tmpx, tmpy)) {
-        if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
+    while (SDL_PollEvent(&mEvent)) {
+        if (mEvent.type != SDL_MOUSEBUTTONDOWN) continue;
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
+        if (startGameButton.mouseFocusOn(tmpx, tmpy)) {
             return 1;
         }
-        startGameButton.setFocus(true);
-    } else {
-        startGameButton.setFocus(false);
-    }
-    if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
-        if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
+        if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
             return 2;
         }
-        exitGameButton.setFocus(true);
-    } else {
-        exitGameButton.setFocus(false);
     }
     return 0;
 }
@@ -296,57 +312,79 @@ void LGame::startPage() {
     while (!stop) {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
         SDL_RenderClear(mRenderer);
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
         startGameBackGround.render(mRenderer, 0, 0);
-        startGameButton.render(mRenderer);
-        exitGameButton.render(mRenderer);
+        startGameButton.render(mRenderer, tmpx, tmpy);
+        exitGameButton.render(mRenderer, tmpx, tmpy);
         SDL_RenderPresent(mRenderer);
-        while (SDL_PollEvent(&mEvent)) {
-            stop = handleStartPageEvent();
-        }
+        stop = handleStartPageEvent();
     }
     Mix_HaltMusic();
     SDL_Delay(400);
     if (stop == 1) gameLoop();
 }
 
-int LGame::handleEndPageEvent() {
-    int tmpx, tmpy;
-    SDL_GetMouseState(&tmpx, &tmpy);
-    if (restartGameButton.mouseFocusOn(tmpx, tmpy)) {
-        if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
+int LGame::handleEndPageEvent(bool double_score) {
+    while (SDL_PollEvent(&mEvent)) {
+        if (mEvent.type != SDL_MOUSEBUTTONDOWN) continue;
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
+        if (restartGameButton.mouseFocusOn(tmpx, tmpy)) {
             return 1;
         }
-        restartGameButton.setFocus(true);
-    } else {
-        restartGameButton.setFocus(false);
-    }
-    if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
-        if (mEvent.type == SDL_MOUSEBUTTONDOWN) {
+        if (exitGameButton.mouseFocusOn(tmpx, tmpy)) {
             return 2;
         }
-        exitGameButton.setFocus(true);
-    } else {
-        exitGameButton.setFocus(false);
+        if (!double_score && doubleScoreButton.mouseFocusOn(tmpx, tmpy)) {
+            return 3;
+        }
     }
     return 0;
 }
 
-void LGame::endPage() {
+void LGame::playRickRoll() {
+    SDL_ShowWindow(playVideoWindow);
+    SDL_HideWindow(mWindow);
+    Mix_PlayMusic(rickRollMusic, -1);
+    for (int i = 0; i < 190; ++ i) {
+        SDL_SetRenderDrawColor(playVideoRenderer, 255, 255, 255, 255);
+        SDL_RenderClear(playVideoRenderer);
+        rickRoll[i].render(playVideoRenderer, 0, 0);
+        SDL_RenderPresent(playVideoRenderer);
+        SDL_Delay(36);   
+    }
+    Mix_HaltMusic();
+    SDL_ShowWindow(mWindow);
+    SDL_HideWindow(playVideoWindow);
+}
+
+void LGame::endPage(bool double_score) {
     int stop = 0;
     while (!stop) {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
         SDL_RenderClear(mRenderer);
         backGround.render(mRenderer, 0, 0);
         popUpEndGameBackGround.render(mRenderer, 35, 250);
-        restartGameButton.render(mRenderer);
-        exitGameButton.render(mRenderer);
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
+        restartGameButton.render(mRenderer, tmpx, tmpy);
+        exitGameButton.render(mRenderer, tmpx, tmpy);
+        if (!double_score) doubleScoreButton.render(mRenderer, tmpx, tmpy);
         sc.printScore(mRenderer, mFont, 178, 143, 162, 73);
         sc.printScore(mRenderer, mFont, 280, 375, 100, 60, sc.readScore("../assets/bestScore.txt"));
-
         SDL_RenderPresent(mRenderer);
-        while (SDL_PollEvent(&mEvent)) {
-            stop = handleEndPageEvent();
-        }
+        stop = handleEndPageEvent(double_score);
     }
     if (stop == 1) gameLoop();
+    if (stop == 3) {
+        if (!rnd.randnum(0, 2)) {
+            playRickRoll();
+            endPage(0);
+        } else {
+            sc.doubleScore();
+            sc.saveScore("../assets/bestScore.txt");
+            endPage(1);
+        }
+    }
 }

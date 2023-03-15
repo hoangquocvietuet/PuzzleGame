@@ -81,7 +81,7 @@ bool LPiece::mouseFocusOn(int _x, int _y) {
     for (auto str : pattern) {
         int tmpx = x;
         for (auto ch : str) {
-            if (ch == blockWood && inside(tmpx, tmpy, SMALL_SQUARE_LENGTH, SMALL_SQUARE_LENGTH, _x, _y)) {
+            if (ch == blockWood && inside(tmpx, tmpy, SQUARE_LENGTH, SQUARE_LENGTH, _x, _y)) {
                 return true;
             }
             tmpx += SMALL_SQUARE_DISTANCE;

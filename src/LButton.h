@@ -26,20 +26,9 @@ class LButton {
         /*
             render button texture
         */
-		void render(SDL_Renderer* gRenderer);
-
-        /*
-            set focus
-        */
-        void setFocus(bool _focus);
+		void render(SDL_Renderer* gRenderer, int _x, int _y);
 
 	protected:
-        /*
-            is mouse focus on the button
-            -> transparent to make preview effect
-        */
-        bool focus = false;
-
         /*
             coordinate of the button
         */

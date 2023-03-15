@@ -48,6 +48,16 @@ class LGame {
         SDL_Renderer* mRenderer = NULL;
 
         /*
+            play video renderer
+        */
+        SDL_Renderer* playVideoRenderer = NULL;
+
+        /*
+            play video window
+        */
+        SDL_Window* playVideoWindow = NULL;
+
+        /*
             game font
         */
         TTF_Font* mFont;
@@ -57,10 +67,12 @@ class LGame {
         */
         LTexture backGround, startGameBackGround, popUpEndGameBackGround;
 
+        LTexture rickRoll[190];
+
         /*
             button
         */
-        LButton startGameButton, restartGameButton, exitGameButton;
+        LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton;
 
         /*
             LScore to save game process
@@ -108,6 +120,7 @@ class LGame {
         */
         Mix_Music* startGameMusic = NULL;
         Mix_Music* playGameMusic = NULL;
+        Mix_Music* rickRollMusic = NULL;
 
     public:
         /*
@@ -175,7 +188,7 @@ class LGame {
             * open end page
             * its will show best score
         */
-        void endPage();
+        void endPage(bool double_score);
 
         /*
             if you clicked on start game, its running into gameloop
@@ -183,9 +196,11 @@ class LGame {
         int handleStartPageEvent();
 
         /*
-            @return 1 if you clicked on restart, or 2 if exit
+            @return 1 if you clicked on restart, or 2 if exit, or 3 if double score
         */
-        int handleEndPageEvent();
+        int handleEndPageEvent(bool double_score);
+
+        void playRickRoll();
 };
 
 #endif

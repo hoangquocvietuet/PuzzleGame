@@ -41,6 +41,11 @@ class LScore {
         void addScore(int cntRow, int cntCol);
 
         /*
+            multiple score by two
+        */
+        void doubleScore();
+
+        /*
             load score to texture then center and print it to [x, y, w, h] rectangle 
             @param x: top left x
             @param y: top left y

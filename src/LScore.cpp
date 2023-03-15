@@ -43,3 +43,7 @@ void LScore::saveScore(std::string path) {
     std::ofstream output(path.c_str());
     output << current;
 }
+
+void LScore::doubleScore() {
+    totalScore *= 2;
+}
