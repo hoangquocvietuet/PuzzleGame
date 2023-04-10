@@ -21,7 +21,7 @@ SDL_Renderer* gRenderer;
 /*
     font of the window
 */
-TTF_Font* gFont = NULL;
+TTF_Font* gFont = nullptr;
 
 bool init() {
     bool success = true;
@@ -33,12 +33,12 @@ bool init() {
             printf( "Warning: Linear texture filtering not enabled!" );
         }
         gWindow = SDL_CreateWindow("Puzzle Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI);
-        if (gWindow == NULL) {
+        if (gWindow == nullptr) {
             printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
             success = false;
         } else {
             gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-            if (gRenderer == NULL) {
+            if (gRenderer == nullptr) {
                 printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
                 success = false;
             } else {
@@ -53,7 +53,7 @@ bool init() {
                     success = false;
                 }
                 gFont = TTF_OpenFont("../assets/consola.ttf", 50);
-                if(gFont == NULL) {
+                if(gFont == nullptr) {
                     printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
@@ -70,11 +70,11 @@ bool init() {
 
 void close() {
     SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
+    gWindow = nullptr;
     SDL_DestroyRenderer(gRenderer);
-    gRenderer = NULL;
+    gRenderer = nullptr;
     TTF_CloseFont(gFont);
-    gFont = NULL;
+    gFont = nullptr;
     SDL_Quit();
     IMG_Quit();
     TTF_Quit();

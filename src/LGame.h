@@ -40,22 +40,22 @@ class LGame {
         /*
             game window
         */ 
-        SDL_Window* mWindow = NULL;
+        SDL_Window* mWindow = nullptr;
 
         /*
             game renderer
         */
-        SDL_Renderer* mRenderer = NULL;
+        SDL_Renderer* mRenderer = nullptr;
 
         /*
             play video renderer
         */
-        SDL_Renderer* playVideoRenderer = NULL;
+        SDL_Renderer* playVideoRenderer = nullptr;
 
         /*
             play video window
         */
-        SDL_Window* playVideoWindow = NULL;
+        SDL_Window* playVideoWindow = nullptr;
 
         /*
             game font
@@ -118,9 +118,9 @@ class LGame {
         /*
             music !!
         */
-        Mix_Music* startGameMusic = NULL;
-        Mix_Music* playGameMusic = NULL;
-        Mix_Music* rickRollMusic = NULL;
+        Mix_Music* startGameMusic = nullptr;
+        Mix_Music* playGameMusic = nullptr;
+        Mix_Music* rickRollMusic = nullptr;
 
     public:
         /*

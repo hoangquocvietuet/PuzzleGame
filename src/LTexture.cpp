@@ -2,7 +2,7 @@
 
 LTexture::LTexture()
 {
-	mTexture = NULL;
+	mTexture = nullptr;
 	mWidth = 0;
 	mHeight = 0;
 	setBlendMode(SDL_BLENDMODE_BLEND);
@@ -19,11 +19,11 @@ bool LTexture::loadFromFile(SDL_Renderer* gRenderer, std::string path )
 	free();
 
 	//The final texture
-	SDL_Texture* newTexture = NULL;
+	SDL_Texture* newTexture = nullptr;
 
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
+	if( loadedSurface == nullptr )
 	{
 		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
 	}
@@ -34,7 +34,7 @@ bool LTexture::loadFromFile(SDL_Renderer* gRenderer, std::string path )
 
 		//Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-		if( newTexture == NULL )
+		if( newTexture == nullptr )
 		{
 			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
 		}
@@ -51,7 +51,7 @@ bool LTexture::loadFromFile(SDL_Renderer* gRenderer, std::string path )
 
 	//Return success
 	mTexture = newTexture;
-	return mTexture != NULL;
+	return mTexture != nullptr;
 }
 
 bool LTexture::loadFromRenderedText( TTF_Font* gFont, SDL_Renderer* gRenderer, std::string textureText, SDL_Color textColor )
@@ -61,11 +61,11 @@ bool LTexture::loadFromRenderedText( TTF_Font* gFont, SDL_Renderer* gRenderer, s
 
 	//Render text surface
 	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
-	if( textSurface != NULL )
+	if( textSurface != nullptr )
 	{
 		//Create texture from surface pixels
         mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
-		if( mTexture == NULL )
+		if( mTexture == nullptr )
 		{
 			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
 		}
@@ -86,16 +86,16 @@ bool LTexture::loadFromRenderedText( TTF_Font* gFont, SDL_Renderer* gRenderer, s
 
 	
 	//Return success
-	return mTexture != NULL;
+	return mTexture != nullptr;
 }
 
 void LTexture::free()
 {
 	//Free texture if it exists
-	if( mTexture != NULL )
+	if( mTexture != nullptr )
 	{
 		SDL_DestroyTexture( mTexture );
-		mTexture = NULL;
+		mTexture = nullptr;
 		mWidth = 0;
 		mHeight = 0;
 	}
@@ -125,7 +125,7 @@ void LTexture::render( SDL_Renderer* gRenderer, int x, int y, SDL_Rect* clip, do
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 
 	//Set clip rendering dimensions
-	if( clip != NULL )
+	if( clip != nullptr )
 	{
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;

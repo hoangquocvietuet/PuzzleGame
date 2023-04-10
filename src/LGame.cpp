@@ -24,13 +24,13 @@ LGame::LGame(SDL_Renderer* gRenderer, SDL_Window* gWindow, TTF_Font* gFont) {
 }
 
 LGame::~LGame() {
-    mRenderer = NULL;
-    mFont = NULL;
-    mWindow = NULL;
+    mRenderer = nullptr;
+    mFont = nullptr;
+    mWindow = nullptr;
     SDL_DestroyWindow(playVideoWindow);
     SDL_DestroyRenderer(playVideoRenderer);
-    playVideoWindow = NULL;
-    playVideoRenderer = NULL;
+    playVideoWindow = nullptr;
+    playVideoRenderer = nullptr;
 }
  
 bool LGame::loadGameMedia() {
@@ -71,15 +71,15 @@ bool LGame::loadGameMedia() {
         }
     }
     rickRollMusic = Mix_LoadMUS("../assets/rickroll/audio.mp3");
-    if (rickRollMusic == NULL) {
+    if (rickRollMusic == nullptr) {
         success = false;
     }
     startGameMusic = Mix_LoadMUS("../assets/startgame-music.mp3");
-    if (startGameMusic == NULL) {
+    if (startGameMusic == nullptr) {
         success = false;
     }
     playGameMusic = Mix_LoadMUS("../assets/playgame-music.mp3");
-    if (playGameMusic == NULL) {
+    if (playGameMusic == nullptr) {
         success = false;
     }
     return success;
