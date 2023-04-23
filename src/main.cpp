@@ -65,7 +65,7 @@ bool init()
                     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
-                gFont = TTF_OpenFont("../assets/consola.ttf", 50);
+                gFont = TTF_OpenFont("../assets/font.ttf", 50);
                 if (gFont == nullptr)
                 {
                     printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
