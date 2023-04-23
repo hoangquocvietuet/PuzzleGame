@@ -6,11 +6,13 @@
 #include "ALLConst.h"
 #include "LButton.h"
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <vector>
 #include <fstream>
 #include <string>
 
-struct Block {
+struct Block
+{
     /*
         top left coordinate
     */
@@ -22,7 +24,8 @@ struct Block {
     BlockType type;
 };
 
-struct Candidate {
+struct Candidate
+{
     /*
         top left coordinate
     */
@@ -34,151 +37,173 @@ struct Candidate {
     LPiece piece;
 };
 
-class LGame {
-    private:
-        /*
-            game window
-        */ 
-        SDL_Window* mWindow = NULL;
+class LGame
+{
+private:
+    /*
+        game window
+    */
+    SDL_Window *mWindow = nullptr;
 
-        /*
-            game renderer
-        */
-        SDL_Renderer* mRenderer = NULL;
+    /*
+        game renderer
+    */
+    SDL_Renderer *mRenderer = nullptr;
 
-        /*
-            game font
-        */
-        TTF_Font* mFont;
+    /*
+        play video renderer
+    */
+    SDL_Renderer *playVideoRenderer = nullptr;
 
-        /*
-            background:
-        */
-        LTexture backGround, startGameBackGround, popUpEndGameBackGround;
+    /*
+        play video window
+    */
+    SDL_Window *playVideoWindow = nullptr;
 
-        /*
-            button
-        */
-        LButton startGameButton, restartGameButton, exitGameButton;
+    /*
+        game font
+    */
+    TTF_Font *mFont;
 
-        /*
-            LScore to save game process
-        */
-        LScore sc;
-        LRandom rnd;
+    /*
+        background:
+    */
+    LTexture backGround, startGameBackGround, popUpEndGameBackGround;
 
-        /*
-            info about current block
-        */
-        Block currentBlock[SIZE][SIZE];
+    LTexture rickRoll[190];
 
-        /*
-            game event
-        */
-        SDL_Event mEvent;
+    /*
+        button
+    */
+    LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton;
 
-        /*
-            game pieces, we will take three of theese to make candidates
-        */
-        std::vector<LPiece> vectorPiece;
+    /*
+        LScore to save game process
+    */
+    LScore sc;
+    LRandom rnd;
 
-        /*
-            current row that mouse focus on
-        */
-        int row = -1;
-        
-        /*
-            current column that mouse focus on
-        */
-        int col = -1;
-        
-        /*
-            current picked index of candidates
-        */
-        int IdxCandidatePiece = -1;
+    /*
+        info about current block
+    */
+    Block currentBlock[SIZE][SIZE];
 
-        /*
-            candidates, wait list..
-        */
-        Candidate candidatePiece[NUM_CANDIDATE];
+    /*
+        game event
+    */
+    SDL_Event mEvent;
 
-    public:
-        /*
-            * constructor
-            * init position of the blocks in the grid, gameplay, position of candidates piece
-            * loading and init game media
-        */
-        LGame(SDL_Renderer* gRenderer, SDL_Window* gWindow, TTF_Font* gFont);
+    /*
+        game pieces, we will take three of theese to make candidates
+    */
+    std::vector<LPiece> vectorPiece;
 
-        /*
-            *destructor
-        */
-        ~LGame();
+    /*
+        current row that mouse focus on
+    */
+    int row = -1;
 
-        /*
-            load game media: button, background, vector pieces
-        */
-        bool loadGameMedia();     
+    /*
+        current column that mouse focus on
+    */
+    int col = -1;
 
-        /*
-            * call when you want to play game
-            * it will open start page
-        */
-        void startPage();  
+    /*
+        current picked index of candidates
+    */
+    int IdxCandidatePiece = -1;
 
-        /*
-            initialize vectorPieces from a custom file
-        */
-        bool initPieceFromFile(std::string path);
+    /*
+        candidates, wait list..
+    */
+    Candidate candidatePiece[NUM_CANDIDATE];
 
-        bool handleGameEvent();
+    /*
+        music !!
+    */
+    Mix_Music *startGameMusic = nullptr;
+    Mix_Music *playGameMusic = nullptr;
+    Mix_Music *rickRollMusic = nullptr;
 
-        /*
-            @return true if we can set piece in block (u, v)
-        */
-        bool checkCurrentPieceInside(int u, int v, LPiece piece);
+public:
+    /*
+     * constructor
+     * init position of the blocks in the grid, gameplay, position of candidates piece
+     * loading and init game media
+     */
+    LGame(SDL_Renderer *gRenderer, SDL_Window *gWindow, TTF_Font *gFont);
 
-        /*
-            load preview of candidate pieces
-        */
-        void loadPreview();
+    /*
+     *destructor
+     */
+    ~LGame();
 
-        /*
-            we will lose if there is no way to put candidates piece.
-        */
-        bool checkLosingGame();
+    /*
+        load game media: button, background, vector pieces
+    */
+    bool loadGameMedia();
 
-        /*
-            update score and remove filled row or column
-        */
-        void updateScoreAndGameState();
+    /*
+     * call when you want to play game
+     * it will open start page
+     */
+    void startPage();
 
-        /*
-            reset game state
-        */
-        void resetGame();
+    /*
+        initialize vectorPieces from a custom file
+    */
+    bool initPieceFromFile(std::string path);
 
-        /*
-            contains game content
-            when you lose, it will open end pgae
-        */
-        void gameLoop();
+    bool handleGameEvent();
 
-        /*
-            * open end page
-            * its will show best score
-        */
-        void endPage();
+    /*
+        @return true if we can set piece in block (u, v)
+    */
+    bool checkCurrentPieceInside(int u, int v, LPiece piece);
 
-        /*
-            if you clicked on start game, its running into gameloop
-        */
-        bool handleStartPageEvent();
+    /*
+        load preview of candidate pieces
+    */
+    void loadPreview();
 
-        /*
-            @return 1 if you clicked on restart, or 2 if exit
-        */
-        int handleEndPageEvent();
+    /*
+        we will lose if there is no way to put candidates piece.
+    */
+    bool checkLosingGame();
+
+    /*
+        update score and remove filled row or column
+    */
+    void updateScoreAndGameState();
+
+    /*
+        reset game state
+    */
+    void resetGame();
+
+    /*
+        contains game content
+        when you lose, it will open end pgae
+    */
+    void gameLoop();
+
+    /*
+     * open end page
+     * its will show best score
+     */
+    void endPage(bool double_score);
+
+    /*
+        if you clicked on start game, its running into gameloop
+    */
+    int handleStartPageEvent();
+
+    /*
+        @return 1 if you clicked on restart, or 2 if exit, or 3 if double score
+    */
+    int handleEndPageEvent(bool double_score);
+
+    void playRickRoll();
 };
 
 #endif
