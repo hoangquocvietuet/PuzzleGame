@@ -16,12 +16,12 @@ const int SMALL_SQUARE_LENGTH = 34;
 const int SQUARE_DISTANCE = 47;
 
 /*
-    distance bettwen two top left points of two continuous small squares  
+    distance bettwen two top left points of two continuous small squares
 */
 const int SMALL_SQUARE_DISTANCE = 37;
 
 /*
-    number of candidate pieces. 
+    number of candidate pieces.
 */
 const int NUM_CANDIDATE = 3;
 

@@ -8,44 +8,44 @@
 
 class LTexture
 {
-	public:
-		//Initializes variables
-		LTexture();
+public:
+	// Initializes variables
+	LTexture();
 
-		//Deallocates memory
-		~LTexture();
+	// Deallocates memory
+	~LTexture();
 
-		//Loads image at specified path
-        bool loadFromFile(SDL_Renderer* gRenderer, std::string path );
-		
-		//Creates image from font string
-		bool loadFromRenderedText(TTF_Font* gFont, SDL_Renderer* gRenderer, std::string textureText, SDL_Color textColor );
+	// Loads image at specified path
+	bool loadFromFile(SDL_Renderer *gRenderer, std::string path);
 
-		//Deallocates texture
-		void free();
+	// Creates image from font string
+	bool loadFromRenderedText(TTF_Font *gFont, SDL_Renderer *gRenderer, std::string textureText, SDL_Color textColor);
 
-		//Set color modulation
-		void setColor( Uint8 red, Uint8 green, Uint8 blue );
+	// Deallocates texture
+	void free();
 
-		//Set blending
-		void setBlendMode( SDL_BlendMode blending );
+	// Set color modulation
+	void setColor(Uint8 red, Uint8 green, Uint8 blue);
 
-		//Set alpha modulation
-		void setAlpha( Uint8 alpha );
-		
-		//Renders texture at given point
-		void render(SDL_Renderer* myRenderer, int x, int y, SDL_Rect* clip = nullptr, double angle = 0.0, SDL_Point* center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE );
+	// Set blending
+	void setBlendMode(SDL_BlendMode blending);
 
-		//Gets image dimensions
-		int getWidth();
-		int getHeight();
+	// Set alpha modulation
+	void setAlpha(Uint8 alpha);
 
-	private:
-		//The actual hardware texture
-		SDL_Texture* mTexture;
+	// Renders texture at given point
+	void render(SDL_Renderer *myRenderer, int x, int y, SDL_Rect *clip = nullptr, double angle = 0.0, SDL_Point *center = nullptr, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
-		//Image dimensions
-		int mWidth;
-		int mHeight;
+	// Gets image dimensions
+	int getWidth();
+	int getHeight();
+
+private:
+	// The actual hardware texture
+	SDL_Texture *mTexture;
+
+	// Image dimensions
+	int mWidth;
+	int mHeight;
 };
 #endif
