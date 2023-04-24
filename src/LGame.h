@@ -5,8 +5,8 @@
 #include "LScore.h"
 #include "ALLConst.h"
 #include "LButton.h"
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <vector>
 #include <fstream>
 #include <string>
