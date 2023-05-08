@@ -5,7 +5,7 @@ LGame::LGame(SDL_Renderer *gRenderer, SDL_Window *gWindow, TTF_Font *gFont)
     mRenderer = gRenderer;
     mWindow = gWindow;
     mFont = gFont;
-    playVideoWindow = SDL_CreateWindow("who asked", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 360, SDL_WINDOW_BORDERLESS);
+    playVideoWindow = SDL_CreateWindow("RickRoll", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 360, SDL_WINDOW_BORDERLESS);
     playVideoRenderer = SDL_CreateRenderer(playVideoWindow, -1, SDL_RENDERER_ACCELERATED);
     SDL_HideWindow(playVideoWindow);
     if (!loadGameMedia())
@@ -166,7 +166,7 @@ bool LGame::handleGameEvent()
         {
             for (int i = 0; i < NUM_CANDIDATE; ++i)
             {
-                if (candidatePiece[i].piece.mouseFocusOn(tmpx, tmpy))
+                if (candidatePiece[i].piece.mouseFocusOn(tmpx, tmpy) && candidatePiece[i].used == 0)
                 {
                     IdxCandidatePiece = i;
                     SDL_WarpMouseInWindow(mWindow, candidatePiece[IdxCandidatePiece].piece.getX(), candidatePiece[IdxCandidatePiece].piece.getY());
@@ -188,9 +188,21 @@ bool LGame::handleGameEvent()
                         }
                     }
                 }
-                candidatePiece[IdxCandidatePiece].piece = rnd.getOneRandom(vectorPiece);
+                candidatePiece[IdxCandidatePiece].used = 1;
             }
-            candidatePiece[IdxCandidatePiece].piece.setPosition(candidatePiece[IdxCandidatePiece].x, candidatePiece[IdxCandidatePiece].y);
+            int cnt_notused = 0;
+            for (int i = 0; i < NUM_CANDIDATE; ++ i) {
+                if (candidatePiece[i].used == 0) ++ cnt_notused;
+            }
+            if (cnt_notused == 0) {
+                for (int i = 0; i < NUM_CANDIDATE; ++ i) {
+                    candidatePiece[i].piece = rnd.getOneRandom(vectorPiece);
+                    candidatePiece[i].piece.setPosition(candidatePiece[i].x, candidatePiece[i].y);
+                    candidatePiece[i].used = 0;
+                }
+            } else {
+                candidatePiece[IdxCandidatePiece].piece.setPosition(candidatePiece[IdxCandidatePiece].x, candidatePiece[IdxCandidatePiece].y);
+            }
             row = col = -1;
             IdxCandidatePiece = -1;
         }
@@ -243,6 +255,7 @@ bool LGame::checkLosingGame()
 {
     for (int i = 0; i < NUM_CANDIDATE; ++i)
     {
+        if (candidatePiece[i].used == 1) continue;
         for (int j = 0; j < SIZE; ++j)
         {
             for (int k = 0; k < SIZE; ++k)
@@ -336,11 +349,22 @@ void LGame::gameLoop()
                     loadedBlock[currentBlock[i][j].type].render(mRenderer, currentBlock[i][j].x, currentBlock[i][j].y);
                 }
             }
-            for (int i = 0; i < NUM_CANDIDATE; ++i)
+            for (int i = 0; i < NUM_CANDIDATE; ++ i)
             {
-                if (i != IdxCandidatePiece)
+                if (candidatePiece[i].used == 0 && i != IdxCandidatePiece)
                 {
-                    candidatePiece[i].piece.draw(mRenderer, 0, 1, candidatePiece[i].x, candidatePiece[i].y);
+                    bool preview = true;
+                    for (int j = 0; j < SIZE; ++j)
+                    {
+                        for (int k = 0; k < SIZE; ++k)
+                        {
+                            if (checkCurrentPieceInside(j, k, candidatePiece[i].piece))
+                            {
+                                preview = false;
+                            }
+                        }
+                    }   
+                    candidatePiece[i].piece.draw(mRenderer, preview, 1, candidatePiece[i].x, candidatePiece[i].y);
                 }
             }
             loadPreview();
@@ -396,7 +420,7 @@ void LGame::startPage()
 {
     int stop = 0;
     Mix_PlayMusic(startGameMusic, -1);
-    Mix_VolumeMusic(10);
+    Mix_VolumeMusic(30);
     while (!stop)
     {
         SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);

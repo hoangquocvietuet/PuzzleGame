@@ -35,6 +35,11 @@ struct Candidate
         the piece of candidate
     */
     LPiece piece;
+
+    /*
+        used before?
+    */
+    int used = 0;
 };
 
 class LGame
