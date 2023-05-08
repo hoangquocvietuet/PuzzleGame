@@ -29,5 +29,5 @@ my Advanced Programming project - a Puzzle Game built with SDL and C++.
 
 ## Game overview
 
-
+![]
 
