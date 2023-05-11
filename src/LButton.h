@@ -26,6 +26,8 @@ public:
 
     /*
         render button texture
+        _x, _y is current mouse state
+        -> to make it transparent when mouse focus on
     */
     void render(SDL_Renderer *gRenderer, int _x, int _y);
 

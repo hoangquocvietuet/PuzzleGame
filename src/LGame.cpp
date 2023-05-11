@@ -12,9 +12,9 @@ LGame::LGame(SDL_Renderer *gRenderer, SDL_Window *gWindow, TTF_Font *gFont)
     {
         printf("fail to load game media\n");
     }
-    for (int i = 0, ss = 250; i < 10; ++i, ss += SQUARE_DISTANCE)
+    for (int i = 0, ss = 250; i < SIZE; ++i, ss += SQUARE_DISTANCE)
     {
-        for (int j = 0, st = 35; j < 10; ++j, st += SQUARE_DISTANCE)
+        for (int j = 0, st = 35; j < SIZE; ++j, st += SQUARE_DISTANCE)
         {
             currentBlock[i][j].x = st;
             currentBlock[i][j].y = ss;
@@ -71,6 +71,14 @@ bool LGame::loadGameMedia()
         success = false;
     }
     if (!doubleScoreButton.init(mRenderer, "../assets/doubleScore-button.png", 130, 500))
+    {
+        success = false;
+    }
+    if (!instructionButton.init(mRenderer, "../assets/instruction-button.png", 130, 700))
+    {
+        success = false;
+    }
+    if (!instructionPage.loadFromFile(mRenderer, "../assets/instruction-page.png"))
     {
         success = false;
     }
@@ -182,7 +190,7 @@ bool LGame::handleGameEvent()
                 {
                     for (int j = 0; j < candidatePiece[IdxCandidatePiece].piece.getLengthRowPattern(i); ++j)
                     {
-                        if (candidatePiece[IdxCandidatePiece].piece.getCharacterPattern(i, j) == blockWood)
+                        if (candidatePiece[IdxCandidatePiece].piece.getCharacterPattern(i, j) == blockWood) 
                         {
                             currentBlock[i + row][j + col].type = blockWood;
                         }
@@ -318,6 +326,8 @@ void LGame::resetGame()
     for (int i = 0; i < NUM_CANDIDATE; ++i)
     {
         candidatePiece[i].piece = rnd.getOneRandom(vectorPiece);
+        candidatePiece[i].used = 0;
+        // candidatePiece[i].piece = vectorPiece[i];
         candidatePiece[i].piece.setPosition(candidatePiece[i].x, candidatePiece[i].y);
     }
     for (int i = 0; i < SIZE; ++i)
@@ -327,6 +337,7 @@ void LGame::resetGame()
             currentBlock[i][j].type = blockBase;
         }
     }
+    inp.close();
     sc.setScore(0);
     row = col = -1;
     IdxCandidatePiece = -1;
@@ -346,8 +357,10 @@ void LGame::gameLoop()
             {
                 for (int j = 0; j < SIZE; ++j)
                 {
+                    // printf("%d", currentBlock[i][j].type);
                     loadedBlock[currentBlock[i][j].type].render(mRenderer, currentBlock[i][j].x, currentBlock[i][j].y);
                 }
+                // printf("\n");
             }
             for (int i = 0; i < NUM_CANDIDATE; ++ i)
             {
@@ -412,6 +425,10 @@ int LGame::handleStartPageEvent()
         {
             return 2;
         }
+        if (instructionButton.mouseFocusOn(tmpx, tmpy)) 
+        {
+            return 3;
+        }
     }
     return 0;
 }
@@ -430,13 +447,41 @@ void LGame::startPage()
         startGameBackGround.render(mRenderer, 0, 0);
         startGameButton.render(mRenderer, tmpx, tmpy);
         exitGameButton.render(mRenderer, tmpx, tmpy);
+        instructionButton.render(mRenderer, tmpx, tmpy);
         SDL_RenderPresent(mRenderer);
         stop = handleStartPageEvent();
     }
+    if (stop == 3) 
+        gameInstruction();
     Mix_HaltMusic();
     SDL_Delay(400);
     if (stop == 1)
         gameLoop();
+}
+
+void LGame::gameInstruction() {
+    while (1) 
+    {
+        SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+        SDL_RenderClear(mRenderer);
+        int tmpx, tmpy;
+        SDL_GetMouseState(&tmpx, &tmpy);
+        instructionPage.render(mRenderer, 0, 0);
+        exitGameButton.render(mRenderer, tmpx, tmpy);
+        SDL_RenderPresent(mRenderer);
+        while (SDL_PollEvent(&mEvent))
+        {
+            if (mEvent.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (exitGameButton.mouseFocusOn(tmpx, tmpy))
+                {
+                    return;
+                }
+                startPage();
+                return;
+            }
+        }
+    }
 }
 
 int LGame::handleEndPageEvent(bool double_score)

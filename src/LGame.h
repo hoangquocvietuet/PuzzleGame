@@ -73,14 +73,14 @@ private:
     /*
         background:
     */
-    LTexture backGround, startGameBackGround, popUpEndGameBackGround;
+    LTexture backGround, startGameBackGround, popUpEndGameBackGround, instructionPage;
 
     LTexture rickRoll[190];
 
     /*
         button
     */
-    LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton;
+    LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton, instructionButton;
 
     /*
         LScore to save game process
@@ -209,6 +209,8 @@ public:
     int handleEndPageEvent(bool double_score);
 
     void playRickRoll();
+
+    void gameInstruction();
 };
 
 #endif
