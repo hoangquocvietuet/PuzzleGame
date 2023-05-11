@@ -5,8 +5,8 @@
 #include "LScore.h"
 #include "ALLConst.h"
 #include "LButton.h"
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <vector>
 #include <fstream>
 #include <string>
@@ -35,6 +35,11 @@ struct Candidate
         the piece of candidate
     */
     LPiece piece;
+
+    /*
+        used before?
+    */
+    int used = 0;
 };
 
 class LGame
@@ -68,14 +73,14 @@ private:
     /*
         background:
     */
-    LTexture backGround, startGameBackGround, popUpEndGameBackGround;
+    LTexture backGround, startGameBackGround, popUpEndGameBackGround, instructionPage;
 
     LTexture rickRoll[190];
 
     /*
         button
     */
-    LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton;
+    LButton startGameButton, restartGameButton, exitGameButton, doubleScoreButton, instructionButton;
 
     /*
         LScore to save game process
@@ -204,6 +209,8 @@ public:
     int handleEndPageEvent(bool double_score);
 
     void playRickRoll();
+
+    void gameInstruction();
 };
 
 #endif
