@@ -337,7 +337,6 @@ void LGame::resetGame()
             currentBlock[i][j].type = blockBase;
         }
     }
-    inp.close();
     sc.setScore(0);
     row = col = -1;
     IdxCandidatePiece = -1;
