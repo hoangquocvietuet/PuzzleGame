@@ -29,5 +29,15 @@ my Advanced Programming project - a Puzzle Game built with SDL and C++.
 
 ## Game overview
 
-![]
+![](https://cdn.discordapp.com/attachments/1023290293153431712/1106286003876020335/Screenshot_20230512_012019.png)
 
+--------------------------------------------
+Gameplay
+
+![](https://cdn.discordapp.com/attachments/1023290293153431712/1106286004945571931/Screenshot_20230512_012029.png)
+
+![](https://cdn.discordapp.com/attachments/1023290293153431712/1106286006094807192/Screenshot_20230512_012310.png)
+
+--------------------------------------------
+
+![](https://cdn.discordapp.com/attachments/1023290293153431712/1106286006564565103/Screenshot_20230512_012333.png)
