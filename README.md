@@ -14,7 +14,7 @@ my Advanced Programming project - a Puzzle Game built with SDL and C++.
     - For Ubuntu, install `build-essential` via `sudo apt update && sudo apt install build-essential`.
     - For Arch, use command `sudo pacman -Sy base-devel`.
 - Second, install `SDL2`, `SDL2_image`, `SDL2_ttf`, `SDL2_mixer`:
-    - For Ubuntu: `sudo apt-get install libsdl2-dev`.
+    - For Ubuntu: `sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev`.
     - For Arch: `sudo pacmac -S sdl2 sdl2_ttf sdl2_mixer sdl2_image`.
 - CD to `src`, run `make -f Makefile_linux && ./PuzzleGame`
 
